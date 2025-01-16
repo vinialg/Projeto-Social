@@ -6,7 +6,7 @@
 // Configuração de conexão com o banco de dados
 const pgp = require('pg-promise')();
 const db = pgp({
-    host: 'localhost',
+    host: '127.0.0.1',
     port: 5432,
     database: 'infousuario',
     user: 'seila',
