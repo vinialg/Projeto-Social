@@ -15,4 +15,33 @@ const db = pgp({
 
 // db.query("SELECT 1 + 1 AS result").then((result) => console.log(result))
 
+const createTables = async () => {
+    try {
+        await db.none(`
+            CREATE TABLE IF NOT EXISTS users (
+                id SERIAL PRIMARY KEY,
+                name VARCHAR(100) NOT NULL,
+                email VARCHAR(100) UNIQUE NOT NULL,
+                password VARCHAR(255) NOT NULL,
+                created_at TIMESTAMP DEFAULT NOW(),
+                updated_at TIMESTAMP DEFAULT NOW()
+            );
+
+            CREATE TABLE IF NOT EXISTS sessions (
+                id SERIAL PRIMARY KEY,
+                user_id INT NOT NULL,
+                token VARCHAR(255) UNIQUE NOT NULL,
+                created_at TIMESTAMP DEFAULT NOW(),
+                expires_at TIMESTAMP NOT NULL,
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+            );
+        `);
+        console.log("Tabelas criadas com sucesso.");
+    } catch (error) {
+        console.error("Erro ao criar tabelas:", error);
+    }
+};
+
+createTables();
+
 module.exports = db
