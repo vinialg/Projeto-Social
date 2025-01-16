@@ -9,8 +9,8 @@ const db = pgp({
     host: 'localhost',
     port: 5432,
     database: 'infousuario',
-    user: 'postgres',
-    password: 'password'
+    user: 'seila',
+    password: 'l1M0YJ6JikHTMk6Lvd7rsvwUjTMSNrZz'
 });
 
 // db.query("SELECT 1 + 1 AS result").then((result) => console.log(result))
