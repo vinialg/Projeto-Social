@@ -10,7 +10,8 @@
     port: 5432,                   
     database: 'infousuario',      
     user: 'render_user',          
-    password: 'render_password'   
+    password: 'render_password',
+    connectionTimeoutMillis: 5000 
 });
 
 // db.query("SELECT 1 + 1 AS result").then((result) => console.log(result))
