@@ -4,7 +4,8 @@
 // const db = pgp("postgres://postgres:password@localhost:5432/infousuario");
 
 // Configuração de conexão com o banco de dados
-const pgp = require('pg-promise')();
+// const pgp = require('pg-promise')();
+const db = pgp("postgresql://seila:l1M0YJ6JikHTMk6Lvd7rsvwUjTMSNrZz@dpg-cu4odl1u0jms73edgnu0-a.virginia-postgres.render.com/infousuario");
 const db = pgp({
     host: '127.0.0.1',
     port: 5432,
