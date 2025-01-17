@@ -1,6 +1,6 @@
 // const pgp = require("pg-promise")();
 // const { join } = require ("node:path")
-
+require('dotenv').config();
 // const db = pgp("postgres://postgres:password@localhost:5432/infousuario");
 const pgp = require('pg-promise')();
 const db = pgp({
