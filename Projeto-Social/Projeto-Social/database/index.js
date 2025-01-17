@@ -1,42 +1,18 @@
-require('dotenv').config();
-const { Pool } = require('pg');
+// const pgp = require("pg-promise")();
+// const { join } = require ("node:path")
 
-// Configuração do Pool de conexão com o banco de dados
-const db = new Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false, // SSL apenas em produção
+// const db = pgp("postgres://postgres:password@localhost:5432/infousuario");
+
+// Configuração de conexão com o banco de dados
+const pgp = require('pg-promise')();
+const db = pgp({
+    host: 'dpg-cu4odl1u0jms73edgnu0-a.oregon-postgres.render.com',
+    port: 5432,
+    database: 'infousuario',
+    user: 'seila',
+    password: 'l1M0YJ6JikHTMk6Lvd7rsvwUjTMSNrZz'
 });
 
-// Função para criar tabelas
-const createTables = async () => {
-    try {
-        await db.query(`
-            CREATE TABLE IF NOT EXISTS users (
-                id SERIAL PRIMARY KEY,
-                name VARCHAR(100) NOT NULL,
-                email VARCHAR(100) UNIQUE NOT NULL,
-                password VARCHAR(255) NOT NULL,
-                created_at TIMESTAMP DEFAULT NOW(),
-                updated_at TIMESTAMP DEFAULT NOW()
-            );
+// db.query("SELECT 1 + 1 AS result").then((result) => console.log(result))
 
-            CREATE TABLE IF NOT EXISTS sessions (
-                id SERIAL PRIMARY KEY,
-                user_id INT NOT NULL,
-                token VARCHAR(255) UNIQUE NOT NULL,
-                created_at TIMESTAMP DEFAULT NOW(),
-                expires_at TIMESTAMP NOT NULL,
-                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-            );
-        `);
-        console.log("Tabelas criadas com sucesso.");
-    } catch (error) {
-        console.error("Erro ao criar tabelas:", error.message);
-    }
-};
-
-// Criando tabelas no início
-createTables().catch(err => console.error("Erro ao criar tabelas:", err));
-
-// Exportando a instância do banco de dados
-module.exports = db;
+module.exports = db
