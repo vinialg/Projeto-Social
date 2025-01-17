@@ -1,25 +1,17 @@
-// const db = require("./database");
 require('dotenv').config();
 const express = require('express');
 const bcrypt = require('bcrypt');
 const session = require('express-session');
-const bodyParser = require('body-parser');
-const db = require('./database');
-const http = require('http');
-const colors = require('colors');
-const { Sequelize } = require('sequelize');
-
-// const cors = require('cors');
-// app.use(cors());
-
+const { Sequelize, DataTypes, Op } = require('sequelize');
+const path = require('path');
 
 const app = express();
-const server = http.createServer(app);
 const PORT = process.env.PORT || 3001;
-console.log("Server rodando....");
 
+console.log("Server rodando...");
+
+// Configurando Sequelize
 let sequelize;
-
 if (process.env.DB_URL) {
   sequelize = new Sequelize(process.env.DB_URL);
 } else {
@@ -34,122 +26,125 @@ if (process.env.DB_URL) {
   );
 }
 
-// Middleware
-app.use(express.static('./public'));
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
-// res.redirect('/1 Home/index.html');
+// Testando a conexão com o banco de dados
+sequelize.authenticate()
+  .then(() => console.log('Conexão com o banco de dados bem-sucedida!'))
+  .catch(err => console.error('Erro ao conectar ao banco de dados:', err));
 
-app.get('/', function (req, res) {
-    res.redirect('/1 Home/index.html');
-});
+// Definindo o modelo de usuário
+const User = sequelize.define('User', {
+  username: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    unique: true,
+  },
+  name: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  email: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    unique: true,
+    validate: {
+      isEmail: true,
+    },
+  },
+  password: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+}, {});
+
+// Sincronizando o modelo com o banco de dados
+sequelize.sync({ force: false })
+  .then(() => console.log('Tabelas sincronizadas com sucesso!'))
+  .catch(err => console.error('Erro ao sincronizar tabelas:', err));
+
+// Middleware
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Configuração da sessão
 app.use(session({
-    secret: 'infousuario',
-    resave: false,
-    saveUninitialized: true,
+  secret: process.env.SESSION_SECRET || 'defaultsecret',
+  resave: false,
+  saveUninitialized: true,
+  cookie: {
+    secure: process.env.NODE_ENV === 'production',
+    httpOnly: true,
+  },
 }));
 
-// Rota inicial
+// Rotas
 app.get('/', (req, res) => {
-    if (req.session.user) {
-        res.send(`Welcome, ${req.session.user.name}! <a href="/logout">Logout</a>`);
-    } else {
-        res.send('<a href="/login">Login</a> or <a href="/register">Register</a>');
-    }
+  res.redirect('/1 Home/index.html');
 });
 
 // Rota de registro
-// app.get('/register', (req, res) => {
-//     res.send('<form method="post" action="/register"><input name="username" placeholder="Username"/><input name="password" type="password" placeholder="Password"/><button type="submit">Register</button></form>');
-// });
-
 app.post('/register', async (req, res) => {
-    const { username, name, email, password, confirm_password } = req.body;
+  const { username, name, email, password, confirm_password } = req.body;
 
-    if (!username || !name || !email || !password || !confirm_password) {
-        return res.send('Por favor, preencha todos os campos obrigatórios.');
+  if (!username || !name || !email || !password || !confirm_password) {
+    return res.status(400).send('Por favor, preencha todos os campos obrigatórios.');
+  }
+
+  if (password !== confirm_password) {
+    return res.status(400).send('As senhas não coincidem.');
+  }
+
+  try {
+    const existingUser = await User.findOne({
+      where: { [Op.or]: [{ username }, { email }] }
+    });
+
+    if (existingUser) {
+      return res.status(400).send('Erro: Nome de usuário ou email já existe.');
     }
 
-    if (password !== confirm_password) {
-        return res.send('As senhas não coincidem.');
-    }
-
-    try {
-        const existingUser = await db.oneOrNone('SELECT id FROM users WHERE username = $1 OR email = $2', [username, email]);
-        if (existingUser) {
-            return res.send('Erro: Nome de usuário ou email já existe.');
-        }
-
-        const hashedPassword = await bcrypt.hash(password, 10);
-        await db.none('INSERT INTO users (username, name, email, password) VALUES ($1, $2, $3, $4)', [username, name, email, hashedPassword]);
-        res.redirect('/1 Home/usuarioregistrado.html');
-    } catch (err) {
-        res.send('Erro: ' + err.message);
-    }
+    const hashedPassword = await bcrypt.hash(password, 10);
+    await User.create({ username, name, email, password: hashedPassword });
+    res.redirect('/1 Home/usuarioregistrado.html');
+  } catch (err) {
+    res.status(500).send('Erro interno: ' + err.message);
+  }
 });
 
-
 // Rota de login
-// app.get('/login', (req, res) => {
-//     res.send('<form method="post" action="/login"><input name="username" placeholder="Username"/><input name="password" type="password" placeholder="Password"/><button type="submit">Login</button></form>');
-// });
+app.post('/login', async (req, res) => {
+  const { username, password } = req.body;
 
-app.post("/login", async (req, res) => {
-    const { username, password } = req.body;
+  try {
+    const user = await User.findOne({ where: { username } });
 
-    try {
-        const user = await db.oneOrNone('SELECT id, name, username, password FROM users WHERE username = $1', [username]);
-
-        if (user && await bcrypt.compare(password, user.password)) {
-            req.session.user = user;
-            res.redirect('/1 Home/usuariologado.html');
-        } else {
-            res.status(401).send('Invalid credentials. <a href="/login">Try again</a>');
-        }
-    } catch (err) {
-        res.status(500).json({ success: false, message: "Erro interno do servidor" });
+    if (user && await bcrypt.compare(password, user.password)) {
+      req.session.user = user;
+      res.redirect('/1 Home/usuariologado.html');
+    } else {
+      res.status(401).send('Credenciais inválidas.');
     }
+  } catch (err) {
+    res.status(500).send('Erro interno: ' + err.message);
+  }
 });
 
 // Rota de logout
 app.get('/logout', (req, res) => {
-    req.session.destroy();
-    res.redirect('/');
+  req.session.destroy();
+  res.redirect('/');
 });
 
 // Rota para obter o usuário logado
-
-app.get("/user", (req, res) => {
-    if (req.session.user) {
-        res.json({ success: true, name: req.session.user.name }); 
-    } else {
-        res.json({ success: false, message: "Usuário não logado" });
-    }
+app.get('/user', (req, res) => {
+  if (req.session.user) {
+    res.json({ success: true, name: req.session.user.name });
+  } else {
+    res.json({ success: false, message: 'Usuário não logado' });
+  }
 });
 
 // Iniciando o servidor
-server.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+app.listen(PORT, () => {
+  console.log(`Servidor rodando em http://localhost:${PORT}`);
 });
-
-
-// var http = require('http');
-// var express = require('express');
-// var colors = require('colors');
-
-// var app = express();
-
-// app.use(express.static('./public'));
-
-// var server = http.createServer(app);
-
-// server.listen(80);
-
-// console.log("Server rodando....".rainbow);
-
-// app.get('/', function (req, res) {
-//     res.redirect('/1 Home/index.html');
-// });
-
