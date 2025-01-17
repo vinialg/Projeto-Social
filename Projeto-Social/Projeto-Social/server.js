@@ -1,5 +1,5 @@
 // const db = require("./database");
-
+require('dotenv').config();
 const express = require('express');
 const bcrypt = require('bcrypt');
 const session = require('express-session');
@@ -7,7 +7,7 @@ const bodyParser = require('body-parser');
 const db = require('./database');
 const http = require('http');
 const colors = require('colors');
-require('dotenv').config();
+
 // const cors = require('cors');
 // app.use(cors());
 
