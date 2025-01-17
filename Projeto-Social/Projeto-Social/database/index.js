@@ -5,15 +5,20 @@
 
 // Configuração de conexão com o banco de dados
 require('dotenv').config();
-const pgp = require('pg-promise')();
+// const pgp = require('pg-promise')();
 
-const db = pgp({
-    host: process.env.DB_HOST,
-    port: process.env.DB_PORT,
-    database: process.env.DB_NAME,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    connectionTimeoutMillis: 30000, // Timeout opcional
+// const db = pgp({
+//     host: process.env.DB_HOST,
+//     port: process.env.DB_PORT,
+//     database: process.env.DB_NAME,
+//     user: process.env.DB_USER,
+//     password: process.env.DB_PASSWORD,
+//     connectionTimeoutMillis: 30000, // Timeout opcional
+// });
+const { Pool } = require('pg');
+const pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: { rejectUnauthorized: false },
 });
 
 // db.query("SELECT 1 + 1 AS result").then((result) => console.log(result))
