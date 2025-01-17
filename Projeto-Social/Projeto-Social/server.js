@@ -4,7 +4,7 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const session = require('express-session');
 const bodyParser = require('body-parser');
-const db = require('./database');
+// const db = require('./database');
 const http = require('http');
 const colors = require('colors');
 // const cors = require('cors');
@@ -13,7 +13,7 @@ const colors = require('colors');
 
 const app = express();
 const server = http.createServer(app);
-const PORT = 5432;
+const PORT = 3001;
 console.log("Server rodando....");
 
 // Middleware
