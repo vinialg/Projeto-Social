@@ -16,7 +16,7 @@ require('dotenv').config();
 //     connectionTimeoutMillis: 30000, // Timeout opcional
 // });
 const { Pool } = require('pg');
-const pool = new Pool({
+const db = new Pool({
     connectionString: process.env.DATABASE_URL,
     ssl: { rejectUnauthorized: false },
 });
