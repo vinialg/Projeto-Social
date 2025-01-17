@@ -4,14 +4,16 @@
 // const db = pgp("postgres://postgres:password@localhost:5432/infousuario");
 
 // Configuração de conexão com o banco de dados
-    const pgp = require('pg-promise')();
-    const db = pgp({
-    host: 'dpg-cu4odl1u0jms73edgnu0-a.onrender.com',        
-    port: 5432,                   
-    database: 'infousuario',      
-    user: 'seila',          
-    password: 'l1M0YJ6JikHTMk6Lvd7rsvwUjTMSNrZz',
-    connectionTimeoutMillis: 30000 
+require('dotenv').config();
+const pgp = require('pg-promise')();
+
+const db = pgp({
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    database: process.env.DB_NAME,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    connectionTimeoutMillis: 30000, // Timeout opcional
 });
 
 // db.query("SELECT 1 + 1 AS result").then((result) => console.log(result))
