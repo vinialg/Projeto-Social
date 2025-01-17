@@ -6,7 +6,7 @@
 // Configuração de conexão com o banco de dados
     const pgp = require('pg-promise')();
     const db = pgp({
-    host: 'db-dpg-cu4odl1u0jms73edgnu0-a.onrender.com',        
+    host: 'dpg-cu4odl1u0jms73edgnu0-a.onrender.com',        
     port: 5432,                   
     database: 'infousuario',      
     user: 'render_user',          
