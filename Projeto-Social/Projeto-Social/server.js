@@ -88,7 +88,7 @@ app.post("/login", async (req, res) => {
             req.session.user = user;
             res.redirect('/1 Home/usuariologado.html');
         } else {
-            res.status(401).send('Invalid credentials. <a href="/login">Try again</a>');
+            res.status(401).send('Invalid credentials. <a href="./1 Home/login.html">Try again</a>');
         }
     } catch (err) {
         res.status(500).json({ success: false, message: "Erro interno do servidor" });
