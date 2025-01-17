@@ -9,8 +9,8 @@
     host: 'dpg-cu4odl1u0jms73edgnu0-a.onrender.com',        
     port: 5432,                   
     database: 'infousuario',      
-    user: 'render_user',          
-    password: 'render_password',
+    user: 'seila',          
+    password: 'l1M0YJ6JikHTMk6Lvd7rsvwUjTMSNrZz',
     connectionTimeoutMillis: 30000 
 });
 
