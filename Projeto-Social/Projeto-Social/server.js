@@ -7,6 +7,7 @@ const bodyParser = require('body-parser');
 const db = require('./database');
 const http = require('http');
 const colors = require('colors');
+const { Sequelize } = require('sequelize');
 
 // const cors = require('cors');
 // app.use(cors());
