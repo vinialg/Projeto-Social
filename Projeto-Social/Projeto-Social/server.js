@@ -13,7 +13,7 @@ const colors = require('colors');
 
 const app = express();
 const server = http.createServer(app);
-const PORT = 3001;
+const PORT = 5432;
 console.log("Server rodando....");
 
 // Middleware
